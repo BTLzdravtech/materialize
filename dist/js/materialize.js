@@ -8136,16 +8136,27 @@ $jscomp.polyfill = function (e, r, p, m) {
        */
       value: function _handleInputFocus() {
         this.$el.addClass('focus');
+        this.$label.addClass('active');
       }
 
       /**
        * Handle Input Blur
+       * @param {Event} e
        */
 
     }, {
       key: "_handleInputBlur",
-      value: function _handleInputBlur() {
+      value: function _handleInputBlur(e) {
         this.$el.removeClass('focus');
+        if (!$(e.relatedTarget).hasClass('autocomplete-content')) {
+          this.addChip({
+            tag: this.$input.val()
+          });
+          this.$input.val('');
+          if (this.chipsData.length === 0) {
+            this.$label.removeClass('active');
+          }
+        }
       }
 
       /**

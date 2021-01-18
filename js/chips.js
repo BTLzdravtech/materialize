@@ -258,13 +258,24 @@
      */
     _handleInputFocus() {
       this.$el.addClass('focus');
+      this.$label.addClass('active');
     }
 
     /**
      * Handle Input Blur
+     * @param {Event} e
      */
-    _handleInputBlur() {
+    _handleInputBlur(e) {
       this.$el.removeClass('focus');
+      if (!$(e.relatedTarget).hasClass('autocomplete-content')) {
+        this.addChip({
+          tag: this.$input.val()
+        });
+        this.$input.val('');
+        if (this.chipsData.length === 0) {
+          this.$label.removeClass('active');
+        }
+      }
     }
 
     /**
