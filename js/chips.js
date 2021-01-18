@@ -7,6 +7,11 @@
     secondaryPlaceholder: '',
     autocompleteOptions: {},
     autocompleteOnly: false,
+    hidden: {
+      enable: false,
+      inputName: '',
+      required: false
+    },
     limit: Infinity,
     onChipAdd: null,
     onChipSelect: null,
@@ -45,7 +50,7 @@
        */
       this.options = $.extend({}, Chips.defaults, options);
 
-      this.$el.addClass('chips input-field');
+      this.$el.addClass('chips');
       this.chipsData = [];
       this.$chips = $();
       this._setupInput();
@@ -69,6 +74,11 @@
 
       this._setPlaceholder();
       this._setupLabel();
+
+      if (this.options.hidden.enable) {
+        this._setupHiddenInput();
+      }
+
       this._setupEventHandlers();
     }
 
@@ -112,6 +122,7 @@
       this._handleInputKeydownBound = this._handleInputKeydown.bind(this);
       this._handleInputFocusBound = this._handleInputFocus.bind(this);
       this._handleInputBlurBound = this._handleInputBlur.bind(this);
+      this._handleLabelClickBound = this._handleLabelClick.bind(this);
 
       this.el.addEventListener('click', this._handleChipClickBound);
       document.addEventListener('keydown', Chips._handleChipsKeydown);
@@ -120,6 +131,7 @@
       this.$input[0].addEventListener('focus', this._handleInputFocusBound);
       this.$input[0].addEventListener('blur', this._handleInputBlurBound);
       this.$input[0].addEventListener('keydown', this._handleInputKeydownBound);
+      this.$label[0].addEventListener('click', this._handleLabelClickBound);
     }
 
     /**
@@ -289,6 +301,14 @@
     }
 
     /**
+     * Handle Label Click
+     * @param {Event} e
+     */
+    _handleLabelClick(e) {
+      this.$input[0].focus();
+    }
+
+    /**
      * Render Chip
      * @param {chip} chip
      * @return {Element}
@@ -364,7 +384,7 @@
      * Setup Label
      */
     _setupLabel() {
-      this.$label = this.$el.find('label');
+      this.$label = this.$el.siblings('label');
       if (this.$label.length) {
         this.$label[0].setAttribute('for', this.$input.attr('id'));
       }
@@ -382,6 +402,45 @@
       ) {
         $(this.$input).prop('placeholder', this.options.secondaryPlaceholder);
       }
+    }
+
+    /**
+     * Setup hidden input
+     */
+    _setupHiddenInput() {
+      this.$el.siblings('input[type=hidden]').remove();
+      this.$hidden = $('<input type="hidden" />');
+      if (this.$el.siblings('label').length) {
+        this.$el.siblings('label').after(this.$hidden);
+      } else {
+        this.$el.after(this.$hidden);
+      }
+      if (this.options.hidden.inputName) {
+        this.$hidden.attr('name', this.options.hidden.inputName);
+      }
+      if (this.options.hidden.required) {
+        this.$hidden.prop('required', true);
+        this.$hidden.attr('aria-required', 'true');
+      }
+    }
+
+    /**
+     * Set hidden input
+     */
+    _setHiddenInput() {
+      if (typeof this.$hidden === 'undefined' || this.$hidden === null) {
+        return;
+      }
+
+      let hiddenData = '';
+      for (var i = 0; i < this.chipsData.length; i++) {
+        if (i === this.chipsData.length - 1) {
+          hiddenData = hiddenData + this.chipsData[i].tag;
+        } else {
+          hiddenData = hiddenData + this.chipsData[i].tag + ',';
+        }
+      }
+      this.$hidden.val(hiddenData);
     }
 
     /**
@@ -418,6 +477,16 @@
       $(this.$input).before(renderedChip);
       this._setPlaceholder();
 
+      this._setHiddenInput();
+
+      if (
+        typeof this.$hidden !== 'undefined' &&
+        this.$hidden !== null &&
+        this.$hidden.prop('required') === true
+      ) {
+        this.$el.removeClass('invalid').addClass('valid');
+      }
+
       // fire chipAdd callback
       if (typeof this.options.onChipAdd === 'function') {
         this.options.onChipAdd.call(this, this.$el, renderedChip);
@@ -436,6 +505,17 @@
       });
       this.chipsData.splice(chipIndex, 1);
       this._setPlaceholder();
+
+      this._setHiddenInput();
+
+      if (
+        typeof this.$hidden !== 'undefined' &&
+        this.$hidden !== null &&
+        this.$hidden.prop('required') === true &&
+        this.chipsData.length === 0
+      ) {
+        this.$el.removeClass('valid').addClass('invalid');
+      }
 
       // fire chipDelete callback
       if (typeof this.options.onChipDelete === 'function') {

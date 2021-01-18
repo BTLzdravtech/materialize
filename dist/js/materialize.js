@@ -7952,6 +7952,11 @@ $jscomp.polyfill = function (e, r, p, m) {
     secondaryPlaceholder: '',
     autocompleteOptions: {},
     autocompleteOnly: false,
+    hidden: {
+      enable: false,
+      inputName: '',
+      required: false
+    },
     limit: Infinity,
     onChipAdd: null,
     onChipSelect: null,
@@ -7995,7 +8000,7 @@ $jscomp.polyfill = function (e, r, p, m) {
        */
       _this45.options = $.extend({}, Chips.defaults, options);
 
-      _this45.$el.addClass('chips input-field');
+      _this45.$el.addClass('chips');
       _this45.chipsData = [];
       _this45.$chips = $();
       _this45._setupInput();
@@ -8019,6 +8024,11 @@ $jscomp.polyfill = function (e, r, p, m) {
 
       _this45._setPlaceholder();
       _this45._setupLabel();
+
+      if (_this45.options.hidden.enable) {
+        _this45._setupHiddenInput();
+      }
+
       _this45._setupEventHandlers();
       return _this45;
     }
@@ -8057,6 +8067,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this._handleInputKeydownBound = this._handleInputKeydown.bind(this);
         this._handleInputFocusBound = this._handleInputFocus.bind(this);
         this._handleInputBlurBound = this._handleInputBlur.bind(this);
+        this._handleLabelClickBound = this._handleLabelClick.bind(this);
 
         this.el.addEventListener('click', this._handleChipClickBound);
         document.addEventListener('keydown', Chips._handleChipsKeydown);
@@ -8065,6 +8076,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.$input[0].addEventListener('focus', this._handleInputFocusBound);
         this.$input[0].addEventListener('blur', this._handleInputBlurBound);
         this.$input[0].addEventListener('keydown', this._handleInputKeydownBound);
+        this.$label[0].addEventListener('click', this._handleLabelClickBound);
       }
 
       /**
@@ -8169,6 +8181,17 @@ $jscomp.polyfill = function (e, r, p, m) {
       }
 
       /**
+       * Handle Label Click
+       * @param {Event} e
+       */
+
+    }, {
+      key: "_handleLabelClick",
+      value: function _handleLabelClick(e) {
+        this.$input[0].focus();
+      }
+
+      /**
        * Render Chip
        * @param {chip} chip
        * @return {Element}
@@ -8261,7 +8284,7 @@ $jscomp.polyfill = function (e, r, p, m) {
     }, {
       key: "_setupLabel",
       value: function _setupLabel() {
-        this.$label = this.$el.find('label');
+        this.$label = this.$el.siblings('label');
         if (this.$label.length) {
           this.$label[0].setAttribute('for', this.$input.attr('id'));
         }
@@ -8279,6 +8302,51 @@ $jscomp.polyfill = function (e, r, p, m) {
         } else if ((this.chipsData === undefined || !!this.chipsData.length) && this.options.secondaryPlaceholder) {
           $(this.$input).prop('placeholder', this.options.secondaryPlaceholder);
         }
+      }
+
+      /**
+       * Setup hidden input
+       */
+
+    }, {
+      key: "_setupHiddenInput",
+      value: function _setupHiddenInput() {
+        this.$el.siblings('input[type=hidden]').remove();
+        this.$hidden = $('<input type="hidden" />');
+        if (this.$el.siblings('label').length) {
+          this.$el.siblings('label').after(this.$hidden);
+        } else {
+          this.$el.after(this.$hidden);
+        }
+        if (this.options.hidden.inputName) {
+          this.$hidden.attr('name', this.options.hidden.inputName);
+        }
+        if (this.options.hidden.required) {
+          this.$hidden.prop('required', true);
+          this.$hidden.attr('aria-required', 'true');
+        }
+      }
+
+      /**
+       * Set hidden input
+       */
+
+    }, {
+      key: "_setHiddenInput",
+      value: function _setHiddenInput() {
+        if (typeof this.$hidden === 'undefined' || this.$hidden === null) {
+          return;
+        }
+
+        var hiddenData = '';
+        for (var i = 0; i < this.chipsData.length; i++) {
+          if (i === this.chipsData.length - 1) {
+            hiddenData = hiddenData + this.chipsData[i].tag;
+          } else {
+            hiddenData = hiddenData + this.chipsData[i].tag + ',';
+          }
+        }
+        this.$hidden.val(hiddenData);
       }
 
       /**
@@ -8321,6 +8389,12 @@ $jscomp.polyfill = function (e, r, p, m) {
         $(this.$input).before(renderedChip);
         this._setPlaceholder();
 
+        this._setHiddenInput();
+
+        if (typeof this.$hidden !== 'undefined' && this.$hidden !== null && this.$hidden.prop('required') === true) {
+          this.$el.removeClass('invalid').addClass('valid');
+        }
+
         // fire chipAdd callback
         if (typeof this.options.onChipAdd === 'function') {
           this.options.onChipAdd.call(this, this.$el, renderedChip);
@@ -8342,6 +8416,12 @@ $jscomp.polyfill = function (e, r, p, m) {
         });
         this.chipsData.splice(chipIndex, 1);
         this._setPlaceholder();
+
+        this._setHiddenInput();
+
+        if (typeof this.$hidden !== 'undefined' && this.$hidden !== null && this.$hidden.prop('required') === true && this.chipsData.length === 0) {
+          this.$el.removeClass('valid').addClass('invalid');
+        }
 
         // fire chipDelete callback
         if (typeof this.options.onChipDelete === 'function') {
