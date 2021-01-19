@@ -145,6 +145,7 @@
       this.$input[0].removeEventListener('focus', this._handleInputFocusBound);
       this.$input[0].removeEventListener('blur', this._handleInputBlurBound);
       this.$input[0].removeEventListener('keydown', this._handleInputKeydownBound);
+      this.$label[0].removeEventListener('click', this._handleLabelClickBound);
     }
 
     /**

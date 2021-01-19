@@ -343,6 +343,9 @@
       let text = el.text().trim();
       this.el.value = text;
       this.$el.trigger('change');
+      if (this.$el.hasClass('invalid') && this.$el[0].validity.valid) {
+        this.$el.removeClass('invalid').addClass('valid');
+      }
       this._resetAutocomplete();
       this.close();
 

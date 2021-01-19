@@ -7097,6 +7097,9 @@ $jscomp.polyfill = function (e, r, p, m) {
         var text = el.text().trim();
         this.el.value = text;
         this.$el.trigger('change');
+        if (this.$el.hasClass('invalid') && this.$el[0].validity.valid) {
+          this.$el.removeClass('invalid').addClass('valid');
+        }
         this._resetAutocomplete();
         this.close();
 
@@ -8092,6 +8095,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.$input[0].removeEventListener('focus', this._handleInputFocusBound);
         this.$input[0].removeEventListener('blur', this._handleInputBlurBound);
         this.$input[0].removeEventListener('keydown', this._handleInputKeydownBound);
+        this.$label[0].removeEventListener('click', this._handleLabelClickBound);
       }
 
       /**
