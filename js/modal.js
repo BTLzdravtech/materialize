@@ -56,7 +56,6 @@
       this.id = this.$el.attr('id');
       this._openingTrigger = undefined;
       this.$overlay = $('<div class="modal-overlay"></div>');
-      this.el.tabIndex = 0;
       this._nthModalOpened = 0;
 
       Modal._count++;

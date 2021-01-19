@@ -2969,7 +2969,6 @@ $jscomp.polyfill = function (e, r, p, m) {
       _this13.id = _this13.$el.attr('id');
       _this13._openingTrigger = undefined;
       _this13.$overlay = $('<div class="modal-overlay"></div>');
-      _this13.el.tabIndex = 0;
       _this13._nthModalOpened = 0;
 
       Modal._count++;
