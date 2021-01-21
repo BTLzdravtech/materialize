@@ -2780,7 +2780,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         if (!closestOverflowParent) {
           closestOverflowParent = !!this.dropdownEl.offsetParent ? this.dropdownEl.offsetParent : this.dropdownEl.parentNode;
         }
-        if (!$(closestOverflowParent).is("td") && $(closestOverflowParent).css('position') === 'static') $(closestOverflowParent).css('position', 'relative');
+        if (!$(closestOverflowParent).is('td') && $(closestOverflowParent).css('position') === 'static') $(closestOverflowParent).css('position', 'relative');
 
         this._moveDropdown(closestOverflowParent);
 
@@ -6907,6 +6907,8 @@ $jscomp.polyfill = function (e, r, p, m) {
 
         this.dropdown = M.Dropdown.init(this.el, dropdownOptions);
 
+        // remove onItemClick to not set to another autocompletes
+        delete dropdownOptions.onItemClick;
         // Sketchy removal of dropdown click handler
         this.el.removeEventListener('click', this.dropdown._handleClickBound);
       }
