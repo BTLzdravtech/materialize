@@ -2780,7 +2780,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         if (!closestOverflowParent) {
           closestOverflowParent = !!this.dropdownEl.offsetParent ? this.dropdownEl.offsetParent : this.dropdownEl.parentNode;
         }
-        if ($(closestOverflowParent).css('position') === 'static') $(closestOverflowParent).css('position', 'relative');
+        if (!$(closestOverflowParent).is("td") && $(closestOverflowParent).css('position') === 'static') $(closestOverflowParent).css('position', 'relative');
 
         this._moveDropdown(closestOverflowParent);
 
