@@ -6907,7 +6907,7 @@ $jscomp.polyfill = function (e, r, p, m) {
 
         this.dropdown = M.Dropdown.init(this.el, dropdownOptions);
 
-        // remove onItemClick to not set to another autocompletes
+        // fix: delete onItemClick to not set to another autocompletes done
         delete dropdownOptions.onItemClick;
         // Sketchy removal of dropdown click handler
         this.el.removeEventListener('click', this.dropdown._handleClickBound);
