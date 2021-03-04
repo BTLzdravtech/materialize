@@ -385,8 +385,20 @@
         matchingData.sort(sortFunctionBound);
       }
 
+      let entryMoreResults = null;
+      if (matchingData.length > this.options.limit) {
+        entryMoreResults = {
+          data: null,
+          key: '+' + (matchingData.length - this.options.limit)
+        };
+      }
+
       // Limit
       matchingData = matchingData.slice(0, this.options.limit);
+
+      if (entryMoreResults != null) {
+        matchingData.push(entryMoreResults);
+      }
 
       // Render
       for (let i = 0; i < matchingData.length; i++) {
