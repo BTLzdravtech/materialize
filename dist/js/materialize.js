@@ -4778,7 +4778,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         var positionOption = this.el.getAttribute('data-position');
 
         if (tooltipTextOption) {
-          attributeOptions.text = tooltipTextOption;
+          attributeOptions.html = tooltipTextOption;
         }
 
         if (positionOption) {
