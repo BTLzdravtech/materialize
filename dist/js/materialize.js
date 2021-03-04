@@ -7103,6 +7103,9 @@ $jscomp.polyfill = function (e, r, p, m) {
       key: "selectOption",
       value: function selectOption(el) {
         var text = el.text().trim();
+        if (text.indexOf('more results') > -1) {
+          return;
+        }
         this.el.value = text;
         this.$el.trigger('change');
         if (this.$el.hasClass('invalid') && this.$el[0].validity.valid) {
@@ -7157,7 +7160,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         if (matchingData.length > this.options.limit) {
           entryMoreResults = {
             data: null,
-            key: '+' + (matchingData.length - this.options.limit)
+            key: '+' + (matchingData.length - this.options.limit) + ' more results'
           };
         }
 
@@ -7172,6 +7175,9 @@ $jscomp.polyfill = function (e, r, p, m) {
         for (var i = 0; i < matchingData.length; i++) {
           var _entry = matchingData[i];
           var item = document.createElement('li');
+          if (_entry.key.indexOf('more results') > -1) {
+            $(item).addClass('more-results');
+          }
           if (!!_entry.data) {
             var img = document.createElement('img');
             img.classList.add('right', 'circle');

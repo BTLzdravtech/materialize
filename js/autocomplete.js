@@ -336,6 +336,9 @@
      */
     selectOption(el) {
       let text = el.text().trim();
+      if (text.indexOf('more results') > -1) {
+        return;
+      }
       this.el.value = text;
       this.$el.trigger('change');
       if (this.$el.hasClass('invalid') && this.$el[0].validity.valid) {
@@ -389,7 +392,7 @@
       if (matchingData.length > this.options.limit) {
         entryMoreResults = {
           data: null,
-          key: '+' + (matchingData.length - this.options.limit)
+          key: '+' + (matchingData.length - this.options.limit) + ' more results'
         };
       }
 
@@ -404,6 +407,9 @@
       for (let i = 0; i < matchingData.length; i++) {
         const entry = matchingData[i];
         const item = document.createElement('li');
+        if (entry.key.indexOf('more results') > -1) {
+          $(item).addClass('more-results');
+        }
         if (!!entry.data) {
           const img = document.createElement('img');
           img.classList.add('right', 'circle');
