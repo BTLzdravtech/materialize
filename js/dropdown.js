@@ -529,8 +529,25 @@
      * Place dropdown
      */
     _placeDropdown() {
+      /**
+       * Get closest ancestor that satisfies the condition
+       * @param {Element} el  Element to find ancestors on
+       * @param {Function} condition  Function that given an ancestor element returns true or false
+       * @returns {Element} Return closest ancestor or null if none satisfies the condition
+       */
+      const getClosestAncestor = function(el, condition) {
+        let ancestor = el.parentNode;
+        while (ancestor !== null && !$(ancestor).is(document)) {
+          if (condition(ancestor)) {
+            return ancestor;
+          }
+          ancestor = ancestor.parentNode;
+        }
+        return null;
+      };
+
       // Container here will be closest ancestor with overflow: hidden
-      let closestOverflowParent = M.getClosestAncestor(this.dropdownEl, (ancestor) => {
+      let closestOverflowParent = getClosestAncestor(this.dropdownEl, (ancestor) => {
         return $(ancestor).css('overflow') !== 'visible';
       });
       // Fallback
