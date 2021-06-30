@@ -17,7 +17,7 @@ jobs:
         npm i
         npm run test
 
-    - name: Build
+    - name: Nightly build
       run: |
         npm run release
 

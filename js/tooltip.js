@@ -79,6 +79,10 @@
     _setTooltipContent(tooltipContentEl) {
       tooltipContentEl.textContent = this.options.text;
       if (!!this.options.html) {
+        // Warn when using html
+        console.warn(
+          'The html option is deprecated and will be removed in the future. See https://github.com/materializecss/materialize/pull/49'
+        );
         $(tooltipContentEl).append(this.options.html);
       }
       if (!!this.options.unsafeHTML) {

@@ -330,8 +330,9 @@
 
       // add icons
       let iconUrl = option.getAttribute('data-icon');
+      let classes = option.getAttribute('class');
       if (!!iconUrl) {
-        let imgEl = $(`<img alt="" src="${iconUrl}">`);
+        let imgEl = $(`<img alt="" class="${classes}" src="${iconUrl}">`);
         liEl.prepend(imgEl);
       }
 
@@ -375,7 +376,9 @@
 
       options.each((el) => {
         if ($(el).prop('selected')) {
-          let text = $(el).text();
+          let text = $(el)
+            .text()
+            .trim();
           values.push(text);
         }
       });

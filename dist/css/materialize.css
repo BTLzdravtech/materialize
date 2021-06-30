@@ -1,6 +1,6 @@
 /*!
- * Materialize v1.0.0 (http://materializecss.com)
- * Copyright 2014-2017 Materialize
+ * Materialize v1.1.0-alpha (https://materializecss.github.io/materialize)
+ * Copyright 2014-2021 Materialize
  * MIT License (https://raw.githubusercontent.com/materializecss/materialize/master/LICENSE)
  */
 .materialize-red {
@@ -2764,7 +2764,7 @@ video.responsive-video {
   float: none;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .pagination {
     width: 100%;
   }
@@ -2867,13 +2867,13 @@ ul.staggered-list li {
 /*********************
   Media Query Classes
 **********************/
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600.99px) {
   .hide-on-small-only, .hide-on-small-and-down {
     display: none !important;
   }
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .hide-on-med-and-down {
     display: none !important;
   }
@@ -2885,7 +2885,7 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (min-width: 600px) and (max-width: 992px) {
+@media only screen and (min-width: 601px) and (max-width: 992.99px) {
   .hide-on-med-only {
     display: none !important;
   }
@@ -2915,13 +2915,13 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (min-width: 600px) and (max-width: 992px) {
+@media only screen and (min-width: 601px) and (max-width: 992.99px) {
   .show-on-medium {
     display: block !important;
   }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600.99px) {
   .show-on-small {
     display: block !important;
   }
@@ -2933,13 +2933,13 @@ ul.staggered-list li {
   }
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .show-on-medium-and-down {
     display: block !important;
   }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600.99px) {
   .center-on-small-only {
     text-align: center;
   }
@@ -3019,7 +3019,7 @@ td, th {
   border-radius: 2px;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   table.responsive-table {
     width: 100%;
     border-collapse: collapse;
@@ -4344,7 +4344,7 @@ nav .brand-logo.center {
           transform: translateX(-50%);
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   nav .brand-logo {
     left: 50%;
     -webkit-transform: translateX(-50%);
@@ -4503,13 +4503,13 @@ html {
   }
 }
 
-@media only screen and (min-width: 992px) {
+@media only screen and (min-width: 993px) {
   html {
     font-size: 14.5px;
   }
 }
 
-@media only screen and (min-width: 1200px) {
+@media only screen and (min-width: 1201px) {
   html {
     font-size: 15px;
   }
@@ -4951,14 +4951,14 @@ small {
   z-index: 10000;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600.99px) {
   #toast-container {
     min-width: 100%;
     bottom: 0%;
   }
 }
 
-@media only screen and (min-width: 601px) and (max-width: 992px) {
+@media only screen and (min-width: 601px) and (max-width: 992.99px) {
   #toast-container {
     left: 5%;
     bottom: 7%;
@@ -5015,7 +5015,7 @@ small {
   border-radius: 24px;
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600.99px) {
   .toast {
     width: 100%;
     border-radius: 0;
@@ -5113,7 +5113,7 @@ small {
   will-change: left, right;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .tabs {
     display: -webkit-box;
     display: -webkit-flex;
@@ -5814,7 +5814,7 @@ body.keyboard-focused .dropdown-content li:focus {
   outline: none;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .modal {
     width: 80%;
   }
@@ -6657,7 +6657,7 @@ textarea.materialize-textarea + label:after, .select-wrapper + label:after {
   margin-left: 3rem;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .input-field .prefix ~ input,
   .input-field .suffix ~ input {
     width: 86%;
@@ -6665,7 +6665,7 @@ textarea.materialize-textarea + label:after, .select-wrapper + label:after {
   }
 }
 
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600.99px) {
   .input-field .prefix ~ input,
   .input-field .suffix ~ input {
     width: 80%;
@@ -7213,15 +7213,12 @@ input[type=checkbox]:not(:disabled).tabbed:focus ~ .lever::before {
 
 /* Select Field
    ========================================================================== */
-select {
-  display: none;
-}
-
 select.browser-default {
-  display: block;
+  opacity: 1;
 }
 
 select {
+  opacity: 0;
   background-color: rgba(255, 255, 255, 0.9);
   width: 100%;
   padding: 5px;
@@ -7283,6 +7280,15 @@ select {
   position: absolute;
   top: -26px;
   font-size: 0.8rem;
+}
+
+.select-wrapper .hide-select {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  z-index: -1;
 }
 
 select:disabled {
@@ -7793,7 +7799,7 @@ input[type=range]::-ms-thumb {
   left: auto;
 }
 
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 992.99px) {
   .sidenav.sidenav-fixed {
     -webkit-transform: translateX(-105%);
             transform: translateX(-105%);
@@ -8570,10 +8576,10 @@ input[type=range]::-ms-thumb {
   visibility: visible;
   -webkit-animation: pulse-animation 1s cubic-bezier(0.24, 0, 0.38, 1) infinite;
           animation: pulse-animation 1s cubic-bezier(0.24, 0, 0.38, 1) infinite;
-  -webkit-transition: opacity .3s, visibility 0s 1s, -webkit-transform .3s;
-  transition: opacity .3s, visibility 0s 1s, -webkit-transform .3s;
-  transition: opacity .3s, transform .3s, visibility 0s 1s;
-  transition: opacity .3s, transform .3s, visibility 0s 1s, -webkit-transform .3s;
+  -webkit-transition: opacity .3s, visibility 0s 1s, -webkit-transform .3s;
+  transition: opacity .3s, visibility 0s 1s, -webkit-transform .3s;
+  transition: opacity .3s, transform .3s, visibility 0s 1s;
+  transition: opacity .3s, transform .3s, visibility 0s 1s, -webkit-transform .3s;
 }
 
 .tap-target {
@@ -8626,10 +8632,10 @@ input[type=range]::-ms-thumb {
 
 .tap-target-wave::after {
   visibility: hidden;
-  -webkit-transition: opacity .3s, visibility 0s, -webkit-transform .3s;
-  transition: opacity .3s, visibility 0s, -webkit-transform .3s;
-  transition: opacity .3s, transform .3s, visibility 0s;
-  transition: opacity .3s, transform .3s, visibility 0s, -webkit-transform .3s;
+  -webkit-transition: opacity .3s, visibility 0s, -webkit-transform .3s;
+  transition: opacity .3s, visibility 0s, -webkit-transform .3s;
+  transition: opacity .3s, transform .3s, visibility 0s;
+  transition: opacity .3s, transform .3s, visibility 0s, -webkit-transform .3s;
   z-index: -1;
 }
 
