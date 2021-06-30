@@ -1457,7 +1457,7 @@ M.throttle = function (func, wait, options) {
 /* Feature detection */
 var passiveIfSupported = false;
 try {
-  window.addEventListener("test", null, Object.defineProperty({}, "passive", {
+  window.addEventListener('test', null, Object.defineProperty({}, 'passive', {
     get: function () {
       passiveIfSupported = { passive: false };
     }
@@ -2780,7 +2780,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         if (!closestOverflowParent) {
           closestOverflowParent = !!this.dropdownEl.offsetParent ? this.dropdownEl.offsetParent : this.dropdownEl.parentNode;
         }
-        if ($(closestOverflowParent).css('position') === 'static') $(closestOverflowParent).css('position', 'relative');
+        if (!$(closestOverflowParent).is('td') && $(closestOverflowParent).css('position') === 'static') $(closestOverflowParent).css('position', 'relative');
 
         this._moveDropdown(closestOverflowParent);
 
@@ -2969,7 +2969,6 @@ $jscomp.polyfill = function (e, r, p, m) {
       _this13.id = _this13.$el.attr('id');
       _this13._openingTrigger = undefined;
       _this13.$overlay = $('<div class="modal-overlay"></div>');
-      _this13.el.tabIndex = 0;
       _this13._nthModalOpened = 0;
 
       Modal._count++;
@@ -4794,7 +4793,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         var positionOption = this.el.getAttribute('data-position');
 
         if (tooltipTextOption) {
-          attributeOptions.text = tooltipTextOption;
+          attributeOptions.html = tooltipTextOption;
         }
 
         if (positionOption) {
@@ -6934,6 +6933,8 @@ $jscomp.polyfill = function (e, r, p, m) {
 
         this.dropdown = M.Dropdown.init(this.el, dropdownOptions);
 
+        // fixed: delete onItemClick to not set to another autocompletes done
+        delete dropdownOptions.onItemClick;
         // Sketchy removal of dropdown click handler
         this.el.removeEventListener('click', this.dropdown._handleClickBound);
       }
@@ -7126,8 +7127,14 @@ $jscomp.polyfill = function (e, r, p, m) {
       key: "selectOption",
       value: function selectOption(el) {
         var text = el.text().trim();
+        if (text.indexOf('more results') > -1) {
+          return;
+        }
         this.el.value = text;
         this.$el.trigger('change');
+        if (this.$el.hasClass('invalid') && this.$el[0].validity.valid) {
+          this.$el.removeClass('invalid').addClass('valid');
+        }
         this._resetAutocomplete();
         this.close();
 
@@ -7173,13 +7180,28 @@ $jscomp.polyfill = function (e, r, p, m) {
           matchingData.sort(sortFunctionBound);
         }
 
+        var entryMoreResults = null;
+        if (matchingData.length > this.options.limit) {
+          entryMoreResults = {
+            data: null,
+            key: '+' + (matchingData.length - this.options.limit) + ' more results'
+          };
+        }
+
         // Limit
         matchingData = matchingData.slice(0, this.options.limit);
+
+        if (entryMoreResults != null) {
+          matchingData.push(entryMoreResults);
+        }
 
         // Render
         for (var i = 0; i < matchingData.length; i++) {
           var _entry = matchingData[i];
           var item = document.createElement('li');
+          if (_entry.key.indexOf('more results') > -1) {
+            $(item).addClass('more-results');
+          }
           if (!!_entry.data) {
             var img = document.createElement('img');
             img.classList.add('right', 'circle');
@@ -7998,6 +8020,11 @@ $jscomp.polyfill = function (e, r, p, m) {
     secondaryPlaceholder: '',
     autocompleteOptions: {},
     autocompleteOnly: false,
+    hidden: {
+      enable: false,
+      inputName: '',
+      required: false
+    },
     limit: Infinity,
     onChipAdd: null,
     onChipSelect: null,
@@ -8041,7 +8068,7 @@ $jscomp.polyfill = function (e, r, p, m) {
        */
       _this45.options = $.extend({}, Chips.defaults, options);
 
-      _this45.$el.addClass('chips input-field');
+      _this45.$el.addClass('chips');
       _this45.chipsData = [];
       _this45.$chips = $();
       _this45._setupInput();
@@ -8065,6 +8092,11 @@ $jscomp.polyfill = function (e, r, p, m) {
 
       _this45._setPlaceholder();
       _this45._setupLabel();
+
+      if (_this45.options.hidden.enable) {
+        _this45._setupHiddenInput();
+      }
+
       _this45._setupEventHandlers();
       return _this45;
     }
@@ -8103,6 +8135,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this._handleInputKeydownBound = this._handleInputKeydown.bind(this);
         this._handleInputFocusBound = this._handleInputFocus.bind(this);
         this._handleInputBlurBound = this._handleInputBlur.bind(this);
+        this._handleLabelClickBound = this._handleLabelClick.bind(this);
 
         this.el.addEventListener('click', this._handleChipClickBound);
         document.addEventListener('keydown', Chips._handleChipsKeydown);
@@ -8111,6 +8144,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.$input[0].addEventListener('focus', this._handleInputFocusBound);
         this.$input[0].addEventListener('blur', this._handleInputBlurBound);
         this.$input[0].addEventListener('keydown', this._handleInputKeydownBound);
+        this.$label[0].addEventListener('click', this._handleLabelClickBound);
       }
 
       /**
@@ -8127,6 +8161,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.$input[0].removeEventListener('focus', this._handleInputFocusBound);
         this.$input[0].removeEventListener('blur', this._handleInputBlurBound);
         this.$input[0].removeEventListener('keydown', this._handleInputKeydownBound);
+        this.$label[0].removeEventListener('click', this._handleLabelClickBound);
       }
 
       /**
@@ -8170,16 +8205,29 @@ $jscomp.polyfill = function (e, r, p, m) {
        */
       value: function _handleInputFocus() {
         this.$el.addClass('focus');
+        this.$label.addClass('active');
       }
 
       /**
        * Handle Input Blur
+       * @param {Event} e
        */
 
     }, {
       key: "_handleInputBlur",
-      value: function _handleInputBlur() {
+      value: function _handleInputBlur(e) {
         this.$el.removeClass('focus');
+        if (!$(e.relatedTarget).hasClass('autocomplete-content')) {
+          if (this.$input.val() !== null) {
+            this.addChip({
+              tag: this.$input.val()
+            });
+            this.$input.val('');
+          }
+          if (this.chipsData.length === 0) {
+            this.$label.removeClass('active');
+          }
+        }
       }
 
       /**
@@ -8212,6 +8260,17 @@ $jscomp.polyfill = function (e, r, p, m) {
           e.preventDefault();
           this.selectChip(this.chipsData.length - 1);
         }
+      }
+
+      /**
+       * Handle Label Click
+       * @param {Event} e
+       */
+
+    }, {
+      key: "_handleLabelClick",
+      value: function _handleLabelClick(e) {
+        this.$input[0].focus();
       }
 
       /**
@@ -8307,7 +8366,7 @@ $jscomp.polyfill = function (e, r, p, m) {
     }, {
       key: "_setupLabel",
       value: function _setupLabel() {
-        this.$label = this.$el.find('label');
+        this.$label = this.$el.siblings('label');
         if (this.$label.length) {
           this.$label[0].setAttribute('for', this.$input.attr('id'));
         }
@@ -8325,6 +8384,51 @@ $jscomp.polyfill = function (e, r, p, m) {
         } else if ((this.chipsData === undefined || !!this.chipsData.length) && this.options.secondaryPlaceholder) {
           $(this.$input).prop('placeholder', this.options.secondaryPlaceholder);
         }
+      }
+
+      /**
+       * Setup hidden input
+       */
+
+    }, {
+      key: "_setupHiddenInput",
+      value: function _setupHiddenInput() {
+        this.$el.siblings('input[type=hidden]').remove();
+        this.$hidden = $('<input type="hidden" />');
+        if (this.$el.siblings('label').length) {
+          this.$el.siblings('label').after(this.$hidden);
+        } else {
+          this.$el.after(this.$hidden);
+        }
+        if (this.options.hidden.inputName) {
+          this.$hidden.attr('name', this.options.hidden.inputName);
+        }
+        if (this.options.hidden.required) {
+          this.$hidden.prop('required', true);
+          this.$hidden.attr('aria-required', 'true');
+        }
+      }
+
+      /**
+       * Set hidden input
+       */
+
+    }, {
+      key: "_setHiddenInput",
+      value: function _setHiddenInput() {
+        if (typeof this.$hidden === 'undefined' || this.$hidden === null) {
+          return;
+        }
+
+        var hiddenData = '';
+        for (var i = 0; i < this.chipsData.length; i++) {
+          if (i === this.chipsData.length - 1) {
+            hiddenData = hiddenData + this.chipsData[i].tag;
+          } else {
+            hiddenData = hiddenData + this.chipsData[i].tag + ',';
+          }
+        }
+        this.$hidden.val(hiddenData);
       }
 
       /**
@@ -8367,6 +8471,12 @@ $jscomp.polyfill = function (e, r, p, m) {
         $(this.$input).before(renderedChip);
         this._setPlaceholder();
 
+        this._setHiddenInput();
+
+        if (typeof this.$hidden !== 'undefined' && this.$hidden !== null && this.$hidden.prop('required') === true) {
+          this.$el.removeClass('invalid').addClass('valid');
+        }
+
         // fire chipAdd callback
         if (typeof this.options.onChipAdd === 'function') {
           this.options.onChipAdd.call(this, this.$el, renderedChip);
@@ -8388,6 +8498,12 @@ $jscomp.polyfill = function (e, r, p, m) {
         });
         this.chipsData.splice(chipIndex, 1);
         this._setPlaceholder();
+
+        this._setHiddenInput();
+
+        if (typeof this.$hidden !== 'undefined' && this.$hidden !== null && this.$hidden.prop('required') === true && this.chipsData.length === 0) {
+          this.$el.removeClass('valid').addClass('invalid');
+        }
 
         // fire chipDelete callback
         if (typeof this.options.onChipDelete === 'function') {
@@ -9299,6 +9415,8 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.cancelBtn.innerHTML = this.options.i18n.cancel;
 
         if (this.options.container) {
+          var optEl = this.options.container;
+          this.options.container = optEl instanceof HTMLElement ? optEl : document.querySelector(optEl);
           this.$modalEl.appendTo(this.options.container);
         } else {
           this.$modalEl.insertBefore(this.el);
@@ -10234,7 +10352,8 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.modalEl.id = 'modal-' + this.id;
 
         // Append popover to input by default
-        var containerEl = document.querySelector(this.options.container);
+        var optEl = this.options.container;
+        var containerEl = optEl instanceof HTMLElement ? optEl : document.querySelector(optEl);
         if (this.options.container && !!containerEl) {
           this.$modalEl.appendTo(containerEl);
         } else {
@@ -12180,10 +12299,7 @@ $jscomp.polyfill = function (e, r, p, m) {
         this.wrapper = document.createElement('div');
         $(this.wrapper).addClass('select-wrapper ' + this.options.classes);
         this.$el.before($(this.wrapper));
-        // Move actual select element into overflow hidden wrapper
-        var $hideSelect = $('<div class="hide-select"></div>');
-        $(this.wrapper).append($hideSelect);
-        $hideSelect[0].appendChild(this.el);
+        this.wrapper.appendChild(this.el);
 
         if (this.el.disabled) {
           this.wrapper.classList.add('disabled');
@@ -12221,7 +12337,7 @@ $jscomp.polyfill = function (e, r, p, m) {
           });
         }
 
-        $(this.wrapper).append(this.dropdownOptions);
+        this.$el.after(this.dropdownOptions);
 
         // Add input dropdown
         this.input = document.createElement('input');
@@ -12233,12 +12349,12 @@ $jscomp.polyfill = function (e, r, p, m) {
           $(this.input).prop('disabled', 'true');
         }
 
-        $(this.wrapper).prepend(this.input);
+        this.$el.before(this.input);
         this._setValueToInput();
 
         // Add caret
         var dropdownIcon = $('<svg class="caret" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-        $(this.wrapper).prepend(dropdownIcon[0]);
+        this.$el.before(dropdownIcon[0]);
 
         // Initialize dropdown
         if (!this.el.disabled) {
@@ -12398,6 +12514,10 @@ $jscomp.polyfill = function (e, r, p, m) {
           if (firstDisabled.length && firstDisabled[0].value === '') {
             values.push(firstDisabled.text());
           }
+        }
+
+        if ($(this.dropdownOptions).find('li:not(.disabled).selected').length > 0 && $(this.wrapper).hasClass('invalid')) {
+          $(this.wrapper).removeClass('invalid').addClass('valid');
         }
 
         this.input.value = values.join(', ');
